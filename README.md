@@ -2,7 +2,7 @@
 My CSE 284 project, which is a tool to perform imputation on incomplete SNP genotype data.
 
 ## Project Overview
-I am using phased data from chromosome 1 of the 1000Genomes dataset (minus the last 100 samples) as training data to inform my predictions, and the final 100 samples as test data. To simulate incomplete data, I am randomly masking 10% of the SNP genotypes in the final 100 samples, and saving the results in a file called ```missing10.vcf```, which you can't find in the repo, since it is too large. So far, it only uses the first 25k SNPs, since runtime is still a serious concern during testing. Using the command ```python imputerSE.py``` (simple for now, but will convert into a full command-line tool for the final), you can run the same analysis pipeline, which takes the truncated chromosome 1 data, and imputes.
+I am using phased data from chromosome 1 of the 1000Genomes dataset (minus the last 50 samples) as training data to inform my predictions, and the final 50 samples as test data. To simulate incomplete data, I am randomly masking 10% of the SNP genotypes in the final 50 samples, and saving the results in a file called ```missing10.vcf```, which you can't find in the repo, since it is too large. So far, it only uses the first 25k SNPs, since runtime is still a serious concern during testing. Using the command ```python imputerSE.py``` (simple for now, but will convert into a full command-line tool for the final), you can run the same analysis pipeline, which takes the truncated chromosome 1 data, and imputes.
 
 ## File Explanations
 ### Python Scripts:
