@@ -18,7 +18,7 @@ I am using phased data from chromosome 1 of the 1000Genomes dataset (minus the l
 Other files can be ignored for now.
 
 ## Other Notes for Peer Reviewers
-I would recommend that you clone this repo in your CSE 284 Datahub, so you can easily access the data and compute resources needed. You will need to move ```~/public/1000Genomes/ALL.chr1.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz``` into this repo's folder ```snp_data``` and rename it to ```chr1_train.vcf.gz``` for the code to actually do anything. To generate your own ```missing10.vcf```, which is required to run the code on your end, run the command ```python simulate_missing.py```. From there, you should just be able to run ```python imputerSE.py``` to run the main pipeline. 
+I would recommend that you clone this repo in your CSE 284 Datahub, so you can easily access the data and compute resources needed. You will need to move ```~/public/1000Genomes/ALL.chr1.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz``` into this repo's folder ```snp_data``` and rename it to ```chr1_train.vcf.gz``` for the code to actually do anything. To generate your own unique ```missing10.vcf``` (not required if you already see the file present in the repo), run the command ```python simulate_missing.py```. From there, you should just be able to run ```python imputerSE.py``` to run the main pipeline. 
 
 As you can tell, my project is still not complete. So far, I have only been able to impute on very small test sets, and I don't have a good grasp on how I could extend the project to reasonably run on larger datasets. I will have to look into more state-of-the-art algorithms to see if I can improve performance in that regard. 
 
