@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imputerSE"
+version = "0.1.0"
+description = "Example CLI tool"
+authors = [{name="Jack Kissinger"}]
+requires-python = ">=3.8"
+
+[project.scripts]
+imputerSE = "imputerSE:main"
