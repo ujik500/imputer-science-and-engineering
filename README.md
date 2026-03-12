@@ -6,9 +6,11 @@ I am using phased data from chromosome 1 of the 1000Genomes dataset (minus the l
 
 ## Example Usage
 ```
-imputerSE --train snp_data/chr1_train_super_truncated.vcf.gz \
+imputerSE --train snp_data/chr1_train_truncated.vcf.gz \
       --test missing10.vcf \
-      --out predictions.txt
+      --out predictions.txt \
+      --numSNPs 25000 \
+      --window_size 1000
 ```
 
 ## File Explanations
