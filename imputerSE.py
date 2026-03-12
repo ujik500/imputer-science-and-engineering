@@ -125,6 +125,8 @@ def write_predictions(pred_file, segment_index, haplotypes):
         for h in haplotypes:
             f.write(f"{segment_index}\t{h}\n")
 
+def test_accuracy():
+    pass
 
 def run_pipeline(train_path, test_path, pred_path):
     test_lines = read_test_file(test_path)
