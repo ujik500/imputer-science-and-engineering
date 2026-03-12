@@ -21,6 +21,7 @@ def simulate_missing(percent_missing, num_samples, train_path):
                 labels = snp_line[:9]
                 test_set = snp_line[len(snp_line)-num_samples:]
                 for i in range(len(test_set)):
+                    # mask out SNPs with the specified probability
                     if random.random() * 100 < percent_missing:
                         test_set[i] = "???"
                 final_line = "\t".join(labels) + "\t" + "\t".join(test_set)

@@ -1,8 +1,7 @@
 import gzip
 
 def truncate_vcf(input_path, output_path, max_snps=25000):
-    # Open the gzipped input file in read-text mode ('rt') 
-    # and the output file in standard write mode ('w')
+    # Open necessary files
     with gzip.open(input_path, 'rt') as f_in, open(output_path, 'w') as f_out:
         snp_count = 0
         
@@ -28,6 +27,6 @@ def truncate_vcf(input_path, output_path, max_snps=25000):
 
 if __name__ == "__main__":
     input_file = "snp_data/chr1_train.vcf.gz"
-    output_file = "snp_data/chr1_train__truncated.vcf"
+    output_file = "snp_data/chr1_train_truncated.vcf"
     
     truncate_vcf(input_file, output_file)

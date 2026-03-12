@@ -1,12 +1,12 @@
 import gzip
 import argparse
 
-CORE_SIZE = 1000
-CONTEXT = 50
-WINDOW = CORE_SIZE + 2 * CONTEXT
+CORE_SIZE = 1000    # number of SNPs to look at during each segment
+CONTEXT = 50        # number of SNPs to look at as context hanging off each side
+WINDOW = CORE_SIZE + 2 * CONTEXT # total window size
 STEP = CORE_SIZE
-MAX_SNPS = 25000
-
+MAX_SNPS = 25000    # number of SNPs to impute for
+NUM_TEST_SAMPLES = 50   # number of samples to impute for, and exclude from training set
 
 def read_test_file(pred_path):
     with open(pred_path) as f:
@@ -15,7 +15,6 @@ def read_test_file(pred_path):
 
 
 def test_segment_iterator(lines):
-
     num_segments = len(lines) // CORE_SIZE + 1
 
     for seg in range(num_segments):
@@ -27,15 +26,16 @@ def test_segment_iterator(lines):
 
 
 def train_segment_iterator(train_path):
-
+    if not train_path.endswith(".gz"):
+        with open(train_path, 'rb') as f_in, gzip.open(train_path + ".gz", 'wb') as f_out:
+            f_out.write(f_in.read())
+        train_path += ".gz"
     snp_buffer = []
     header_seen = False
     snp_count = 0
 
     with gzip.open(train_path, "rt") as f:
-
         for line in f:
-
             if line.startswith("##"):
                 continue
 
@@ -48,7 +48,9 @@ def train_segment_iterator(train_path):
             if snp_count >= MAX_SNPS:
                 break
 
-            snp_buffer.append(line.strip().split("\t"))
+            line = line.strip().split("\t")
+            line = line[:len(line) - NUM_TEST_SAMPLES] # remove test samples from training
+            snp_buffer.append(line)
             snp_count += 1
 
             if len(snp_buffer) < WINDOW:
@@ -60,18 +62,15 @@ def train_segment_iterator(train_path):
 
 
 def segment_to_haplotypes(seg, gt_start):
-
     num_samples = len(seg[0]) - gt_start
     num_haps = num_samples * 2
 
-    hap_lists = [[] for _ in range(num_haps)]
+    hap_lists = [[] for hap in range(num_haps)]
 
     for snp in seg:
-
         genotypes = snp[gt_start:]
 
         for i, gt in enumerate(genotypes):
-
             h1 = 2 * i
             h2 = 2 * i + 1
 
@@ -90,20 +89,16 @@ def segment_to_haplotypes(seg, gt_start):
 
 
 def nearest_haplotype_impute(test_haps, train_haps):
-
     imputed = []
 
     for th in test_haps:
-
         best_match = None
         best_dist = 10**9
 
         for rh in train_haps:
-
             dist = 0
 
             for a, b in zip(th, rh):
-
                 if a == "?":
                     continue
 
@@ -117,7 +112,6 @@ def nearest_haplotype_impute(test_haps, train_haps):
         new_hap = list(th)
 
         for i, allele in enumerate(new_hap):
-
             if allele == "?":
                 new_hap[i] = best_match[i]
 
@@ -127,24 +121,20 @@ def nearest_haplotype_impute(test_haps, train_haps):
 
 
 def write_predictions(pred_file, segment_index, haplotypes):
-
     with open(pred_file, "a") as f:
-
         for h in haplotypes:
             f.write(f"{segment_index}\t{h}\n")
 
 
-def run_pipeline(train_path, pred_path):
-
-    test_lines = read_test_file(pred_path)
+def run_pipeline(train_path, test_path, pred_path):
+    test_lines = read_test_file(test_path)
 
     test_iter = test_segment_iterator(test_lines)
     train_iter = train_segment_iterator(train_path)
 
-    open("predictions.txt", "w").close()
+    open(pred_path, "w").close()
 
     for i, ((train_seg, gt_start), test_seg) in enumerate(zip(train_iter, test_iter)):
-
         train_haps = segment_to_haplotypes(train_seg, gt_start)
 
         test_haps = segment_to_haplotypes(test_seg, gt_start)
@@ -156,17 +146,18 @@ def run_pipeline(train_path, pred_path):
 
         imputed = nearest_haplotype_impute(test_haps, train_haps)
 
-        write_predictions("predictions.txt", i, imputed)
+        write_predictions(pred_path, i, imputed)
 
         print(f"Segment {i} imputed")
 
 
 if __name__ == "__main__":
 
-    train_path = "snp_data/chr1_train_truncated.vcf.gz"
-    pred_path = "missing10.vcf"
+    train_path = "snp_data/chr1_train_super_truncated.vcf"
+    test_path = "missing10.vcf"
+    pred_path = "predictions.txt"
 
-    run_pipeline(train_path, pred_path)
+    run_pipeline(train_path, test_path, pred_path)
 
 '''
 def main():
@@ -182,9 +173,6 @@ def main():
     segmented_haplotypes = process_pred(pred_path)
     print(segmented_haplotypes[0][0])
     predict_missing(train_path, segmented_haplotypes)
-    
-
-
 
 if __name__ == "__main__":
     main()
