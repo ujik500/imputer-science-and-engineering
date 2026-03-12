@@ -123,6 +123,15 @@ def test_accuracy(train_path, test_path, pred_path):
     correct = {}
     totals = {}
     
+    rare_correct = {}
+    rare_totals = {}
+    
+    recall_correct = 0
+    total = 0
+    
+    rare_recall_correct = 0
+    rare_total = 0
+    
     # RECONSTRUCTION FIX: Stitch segments together by CORE_SIZE to align indexes
     full_pred_haps = [[] for _ in range(NUM_TEST_SAMPLES * 2)]
     with open(pred_path, "r") as pred_file:
@@ -162,6 +171,14 @@ def test_accuracy(train_path, test_path, pred_path):
                 header_seen = True
                 continue
             line = line.strip().split("\t")
+            
+            # filter out non bi-allelic SNPs for accuracy calculations
+            try:
+                maf = float(line[7].split(";")[1][3:])
+            except ValueError:
+                snp_idx += 1
+                continue
+                
             line = line[len(line)-NUM_TEST_SAMPLES:]
             
             # Stop if we've reached the end of what was actually imputed
@@ -176,21 +193,55 @@ def test_accuracy(train_path, test_path, pred_path):
                     pred_allele_1 = pred_haplotypes[i * 2][snp_idx]
                     pred_allele_2 = pred_haplotypes[i * 2 + 1][snp_idx]
 
-                    if allele_1 == pred_allele_1:
-                        correct[name] = correct.get(name, 0) + 1
+                    if maf > 0.01:
+                        if allele_1 == pred_allele_1:
+                            correct[name] = correct.get(name, 0) + 1
+                            if pred_allele_1 != "0":
+                                recall_correct += 1
 
-                    if allele_2 == pred_allele_2:
-                        correct[name] = correct.get(name, 0) + 1
-                                                              
-                    totals[name] = totals.get(name, 0) + 2
+                        if allele_2 == pred_allele_2:
+                            correct[name] = correct.get(name, 0) + 1
+                            if pred_allele_2 != "0":
+                                recall_correct += 1
+
+                        totals[name] = totals.get(name, 0) + 2
+                        
+                        if allele_1 != "0":
+                            total += 1
+                        if allele_2 != "0":
+                            total += 1    
+                    else:
+                        if allele_1 == pred_allele_1:
+                            rare_correct[name] = rare_correct.get(name, 0) + 1
+                            if pred_allele_1 != "0":
+                                rare_recall_correct += 1
+
+                        if allele_2 == pred_allele_2:
+                            rare_correct[name] = rare_correct.get(name, 0) + 1
+                            if pred_allele_2 != "0":
+                                rare_recall_correct += 1
+
+                        rare_totals[name] = rare_totals.get(name, 0) + 2
+                        
+                        if allele_1 != "0":
+                            rare_total += 1
+                        if allele_2 != "0":
+                            rare_total += 1 
+                        
             
             snp_idx += 1
     
     print(f"Accuracy across {snp_idx} SNPs:")
     for key in correct:
         correct[key] = round(correct[key] / totals[key], 4)
-    print(correct)
-    print(totals)
+    for key in rare_correct:
+        rare_correct[key] = round(rare_correct[key] / rare_totals[key], 4)
+    print("Accuracy for common variants:", correct)
+    print("Accuracy for rare variants:", rare_correct)
+    
+    print("Recall for common variants:", recall_correct / total)
+    print("Recall for rare variants:", rare_recall_correct / rare_total)
+
     
 
 def run_pipeline(train_path, test_path, pred_path):
@@ -223,7 +274,7 @@ def run_pipeline(train_path, test_path, pred_path):
 if __name__ == "__main__":
 
     train_path = "snp_data/chr1_train_medium_truncated.vcf"
-    test_path = "missing90.vcf"
+    test_path = "missing10.vcf"
     pred_path = "predictions.txt"
 
     run_pipeline(train_path, test_path, pred_path)
