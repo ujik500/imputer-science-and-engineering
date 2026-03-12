@@ -163,7 +163,7 @@ def run_pipeline(train_path, pred_path):
 
 if __name__ == "__main__":
 
-    train_path = "snp_data/chr1_train_truncated.vcf.gz"
+    train_path = "snp_data/chr1_train_truncated.vcf"
     pred_path = "missing10.vcf"
 
     run_pipeline(train_path, pred_path)
