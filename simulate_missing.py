@@ -35,4 +35,4 @@ def simulate_missing(percent_missing, num_samples, train_path):
     return
 
 
-simulate_missing(90, 50, "snp_data/chr1_train.vcf.gz")
+simulate_missing(70, 50, "snp_data/chr1_train.vcf.gz")

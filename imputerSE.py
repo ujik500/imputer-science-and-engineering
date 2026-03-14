@@ -1,6 +1,7 @@
 import gzip
 import argparse
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 CORE_SIZE = 1000    # number of SNPs to look at during each segment
 CONTEXT = 50        # number of SNPs to look at as context hanging off each side
@@ -236,11 +237,42 @@ def test_accuracy(train_path, test_path, pred_path):
         correct[key] = round(correct[key] / totals[key], 4)
     for key in rare_correct:
         rare_correct[key] = round(rare_correct[key] / rare_totals[key], 4)
-    print("Accuracy for common variants:", correct)
-    print("Accuracy for rare variants:", rare_correct)
+        
+    
+    print("Accuracy for common variants:", sum(correct.values()) / len(correct))
+    print("Accuracy for rare variants:", sum(rare_correct.values()) / len(rare_correct))
     
     print("Recall for common variants:", recall_correct / total)
     print("Recall for rare variants:", rare_recall_correct / rare_total)
+    import matplotlib.pyplot as plt
+
+    # Extract accuracy values from dictionaries
+    common_acc_values = list(correct.values())
+    rare_acc_values = list(rare_correct.values())
+
+    # Create the histogram plot
+    plt.figure(figsize=(10, 6))
+
+    # Plot common variant accuracies
+    plt.hist(common_acc_values, bins=20, alpha=0.5, label='Common Variants', 
+             color='blue', edgecolor='black')
+
+    # Plot rare variant accuracies
+    plt.hist(rare_acc_values, bins=20, alpha=0.5, label='Rare Variants', 
+             color='orange', edgecolor='black')
+
+    # Add labels and styling
+    plt.title('Distribution of Prediction Accuracies across Samples')
+    plt.xlabel('Accuracy')
+    plt.ylabel('Frequency (Number of Samples)')
+    plt.legend(loc='upper left')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+    # Ensure labels are not truncated
+    plt.tight_layout()
+
+    # Save or show the plot
+    plt.savefig('accuracy_distribution.png')
 
     
 
@@ -274,7 +306,7 @@ def run_pipeline(train_path, test_path, pred_path):
 if __name__ == "__main__":
 
     train_path = "snp_data/chr1_train_medium_truncated.vcf"
-    test_path = "missing10.vcf"
+    test_path = "missing70.vcf"
     pred_path = "predictions.txt"
 
     run_pipeline(train_path, test_path, pred_path)
