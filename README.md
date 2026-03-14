@@ -18,9 +18,8 @@ Both train and test data must be phased, and all of the options will have defaul
 * ```beagle_converter.py```: Converts my datafiles to formats BEAGLE can process.
 
 ### Data:
-* ```missing10.vcf```: chr1 1000Genomes data with 10% of SNP genotypes randomly masked out
-* ```snp_data/chr1_train_super_truncated.vcf```: The first 1000 SNPs on chr1, taken from 1000Genomes
-* ```snp_data/chr1_train_truncated.vcf```: The first 25000 SNPs on chr1, taken from 1000Genomes
+* ```snp_data```: This folder contains datafiles of various lengths from chr1 of 1000Genomes. These files are used for training.
+* ```masked_data```: This folder contains datafiles with some SNPs masked out. The number in each filename is the masking percentage. These files are used for testing.
 
 ### Benchmarking Executable:
 * ```beagle.27Feb25.75f.jar```: Executable for BEAGLE version 4.5
