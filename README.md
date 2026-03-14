@@ -12,18 +12,20 @@ Both train and test data must be phased, and all of the options will have defaul
 
 ## File Explanations
 ### Python Scripts:
-* ```imputerSE.py```: The main imputation pipeline
+* ```imputerSE.py```: The main imputation pipeline.
 * ```truncate_vcf.py```: Code used to extract just the first 25k SNPs of the chr1 1000Genomes vcf. This file can also be used to generate even smaller datasets, simply change the ```max_snps``` parameter.
-* ```simulate_missing.py```: Code used to simulate missing data from 1000Genomes at the rate of your choice.
+* ```simulate_missing.py```: Code used to simulate missing data from 1000Genomes at the rate of your choice. This is what was used to create everything in the ```masked_data``` directory.
+* ```beagle_converter.py```: Converts my datafiles to formats BEAGLE can process.
 
 ### Data:
 * ```missing10.vcf```: chr1 1000Genomes data with 10% of SNP genotypes randomly masked out
 * ```snp_data/chr1_train_super_truncated.vcf```: The first 1000 SNPs on chr1, taken from 1000Genomes
 * ```snp_data/chr1_train_truncated.vcf```: The first 25000 SNPs on chr1, taken from 1000Genomes
 
+### Benchmarking Executable:
+* ```beagle.27Feb25.75f.jar```: Executable for BEAGLE version 4.5
 
 
-
-Also, one of my goals for the project was being able to predict missing SNP genotypes on my own AncestryDNA dataset. However, the SNP data from Ancestry or 23andMe is very sparse compared to the 1000Genomes training set, so there can be large gaps (multiple kb), so I would guess that the power to impute with LD is greatly reduced. I will have to decide how to approach that, since I also don't have a very accurate way to benchmark it.
+One of my goals for the project was being able to predict missing SNP genotypes on my own AncestryDNA dataset. However, the SNP data from Ancestry or 23andMe is very sparse compared to the 1000Genomes training set, so there can be large gaps (multiple kb), so I would guess that the power to impute with LD is greatly reduced. I decided to forego that part.
 
 
